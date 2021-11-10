@@ -31,11 +31,11 @@ test("Display error when sign in button is clicked with empty password.", () => 
   expect(passwordHelperText.textContent).toBe("Password cannot be empty");
 });
 
-test("Display error alert when the user cannot be authenticated.", async () => {
+test("Do not display text field error if username and password are not empty.", async () => {
   const { getByTestId } = render(<Login />);
 
   axios.get.mockImplementationOnce(() =>
-    Promise.reject({ response: { status: 401 } })
+    Promise.reject({ response: { } })
   );
 
   let username = document.querySelector("[id=username]");
@@ -48,25 +48,73 @@ test("Display error alert when the user cannot be authenticated.", async () => {
   expect(usernameHelperText).not.toBeInTheDocument();
   expect(passwordHelperText).not.toBeInTheDocument();
 
-  act(() => {
-    fireEvent.change(username, { target: { value: "username" } });
-    fireEvent.change(password, { target: { value: "password" } });
-    fireEvent.click(getByTestId("sign-in-button"));
-  });
+  fireEvent.change(username, { target: { value: "username" } });
+  fireEvent.change(password, { target: { value: "password" } });
+  fireEvent.click(getByTestId("sign-in-button"));
 
   usernameHelperText = document.querySelector("[id=username-helper-text]");
   passwordHelperText = document.querySelector("[id=password-helper-text]");
   expect(usernameHelperText).not.toBeInTheDocument();
   expect(passwordHelperText).not.toBeInTheDocument();
+});
+
+test("Display error alert when the user cannot be authenticated (Error 401).", async () => {
+  const { getByTestId } = render(<Login />);
+
+  axios.get.mockImplementationOnce(() =>
+    Promise.reject({ response: { status: 401 } })
+  );
+
+  let username = document.querySelector("[id=username]");
+  let password = document.querySelector("[id=password]");
+
+  fireEvent.change(username, { target: { value: "username" } });
+  fireEvent.change(password, { target: { value: "password" } });
+  fireEvent.click(getByTestId("sign-in-button"));
 
   let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
   expect(errorAlert).toBeInTheDocument();
   expect(errorAlert.textContent).toBe("Incorrect username or password.");
 });
 
-// test("Display error alert when response status is not 200 nor 401.", () => {
-//     render(<Login />);
-// });
+test("Display error alert when response status is not 200 nor 401.", async () => {
+    const { getByTestId } = render(<Login />);
+  
+    const status = 500;
+    axios.get.mockImplementationOnce(() =>
+      Promise.reject({ response: { status } })
+    );
+  
+    let username = document.querySelector("[id=username]");
+    let password = document.querySelector("[id=password]");
+  
+    fireEvent.change(username, { target: { value: "username" } });
+    fireEvent.change(password, { target: { value: "password" } });
+    fireEvent.click(getByTestId("sign-in-button"));
+  
+    let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
+    expect(errorAlert).toBeInTheDocument();
+    expect(errorAlert.textContent).toBe(`Something unexpected happened. ERROR ${status}`);
+  });
+
+test("Display error alert when there is no response status.", async () => {
+    const { getByTestId } = render(<Login />);
+  
+    axios.get.mockImplementationOnce(() =>
+      Promise.reject("This error has no response status")
+    );
+  
+    let username = document.querySelector("[id=username]");
+    let password = document.querySelector("[id=password]");
+  
+    fireEvent.change(username, { target: { value: "username" } });
+    fireEvent.change(password, { target: { value: "password" } });
+    fireEvent.click(getByTestId("sign-in-button"));
+  
+    let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
+    expect(errorAlert).toBeInTheDocument();
+    expect(errorAlert.textContent).toBe("Something unexpected happened. Try again later.");
+  });
 
 // test("Close error alert when click on exit", () => {
 //     render(<Login />);
