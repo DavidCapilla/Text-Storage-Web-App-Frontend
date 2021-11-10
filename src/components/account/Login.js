@@ -72,10 +72,9 @@ const Login = () => {
         history.push("/user");
       })
       .catch((error) => {
-        console.log(error);
         try {
           error.response.status === 401
-            ? setErrorMessage("You cannot log in!")
+            ? setErrorMessage("Incorrect username or password.")
             : setErrorMessage(
                 `Something unexpected happened. ERROR ${error.response.status}`
               );
@@ -130,6 +129,7 @@ const Login = () => {
             />
             {errorMessage && (
               <Alert
+                data-testid="login-error-alert"
                 severity="error"
                 onClose={() => {
                   setErrorMessage("");
@@ -139,6 +139,7 @@ const Login = () => {
               </Alert>
             )}
             <Button
+              data-testid="sign-in-button"
               type="submit"
               fullWidth
               variant="contained"
