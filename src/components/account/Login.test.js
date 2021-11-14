@@ -1,9 +1,15 @@
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import axios from "axios";
-import { act } from "react-dom/test-utils";
 import Login from "./Login";
 
 jest.mock("axios");
+
+const mockHistoryPush = jest.fn();
+jest.mock("react-router-dom", () => ({
+  useHistory: () => ({
+    push: mockHistoryPush,
+  }),
+}));
 
 test("Display error when sign in button is clicked with empty username.", () => {
   const { getByTestId } = render(<Login />);
@@ -34,9 +40,7 @@ test("Display error when sign in button is clicked with empty password.", () => 
 test("Do not display text field error if username and password are not empty.", async () => {
   const { getByTestId } = render(<Login />);
 
-  axios.get.mockImplementationOnce(() =>
-    Promise.reject({ response: { } })
-  );
+  axios.get.mockImplementationOnce(() => Promise.reject({ response: {} }));
 
   let username = document.querySelector("[id=username]");
   let password = document.querySelector("[id=password]");
@@ -78,51 +82,82 @@ test("Display error alert when the user cannot be authenticated (Error 401).", a
 });
 
 test("Display error alert when response status is not 200 nor 401.", async () => {
-    const { getByTestId } = render(<Login />);
-  
-    const status = 500;
-    axios.get.mockImplementationOnce(() =>
-      Promise.reject({ response: { status } })
-    );
-  
-    let username = document.querySelector("[id=username]");
-    let password = document.querySelector("[id=password]");
-  
-    fireEvent.change(username, { target: { value: "username" } });
-    fireEvent.change(password, { target: { value: "password" } });
-    fireEvent.click(getByTestId("sign-in-button"));
-  
-    let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
-    expect(errorAlert).toBeInTheDocument();
-    expect(errorAlert.textContent).toBe(`Something unexpected happened. ERROR ${status}`);
-  });
+  const { getByTestId } = render(<Login />);
+
+  const status = 500;
+  axios.get.mockImplementationOnce(() =>
+    Promise.reject({ response: { status } })
+  );
+
+  let username = document.querySelector("[id=username]");
+  let password = document.querySelector("[id=password]");
+
+  fireEvent.change(username, { target: { value: "username" } });
+  fireEvent.change(password, { target: { value: "password" } });
+  fireEvent.click(getByTestId("sign-in-button"));
+
+  let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
+  expect(errorAlert).toBeInTheDocument();
+  expect(errorAlert.textContent).toBe(
+    `Something unexpected happened. ERROR ${status}`
+  );
+});
 
 test("Display error alert when there is no response status.", async () => {
-    const { getByTestId } = render(<Login />);
-  
-    axios.get.mockImplementationOnce(() =>
-      Promise.reject("This error has no response status")
-    );
-  
-    let username = document.querySelector("[id=username]");
-    let password = document.querySelector("[id=password]");
-  
-    fireEvent.change(username, { target: { value: "username" } });
-    fireEvent.change(password, { target: { value: "password" } });
-    fireEvent.click(getByTestId("sign-in-button"));
-  
-    let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
-    expect(errorAlert).toBeInTheDocument();
-    expect(errorAlert.textContent).toBe("Something unexpected happened. Try again later.");
-  });
+  const { getByTestId } = render(<Login />);
 
-// test("Close error alert when click on exit", () => {
-//     render(<Login />);
-// });
+  axios.get.mockImplementationOnce(() =>
+    Promise.reject("This error has no response status")
+  );
 
-// test("Redirect to users/{user} when user authenticated.", () => {
-//     render(<Login />);
-// });
+  let username = document.querySelector("[id=username]");
+  let password = document.querySelector("[id=password]");
+
+  fireEvent.change(username, { target: { value: "username" } });
+  fireEvent.change(password, { target: { value: "password" } });
+  fireEvent.click(getByTestId("sign-in-button"));
+
+  let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
+  expect(errorAlert).toBeInTheDocument();
+  expect(errorAlert.textContent).toBe(
+    "Something unexpected happened. Try again later."
+  );
+});
+
+test("Close error alert when click on the close icon.", async () => {
+  const { getByTestId } = render(<Login />);
+
+  axios.get.mockImplementationOnce(() => Promise.reject("Some error"));
+
+  let username = document.querySelector("[id=username]");
+  let password = document.querySelector("[id=password]");
+
+  fireEvent.change(username, { target: { value: "username" } });
+  fireEvent.change(password, { target: { value: "password" } });
+  fireEvent.click(getByTestId("sign-in-button"));
+
+  let errorAlert = await waitFor(() => getByTestId("login-error-alert"));
+  expect(errorAlert).toBeInTheDocument();
+
+  fireEvent.click(getByTestId("CloseIcon"));
+  expect(errorAlert).not.toBeInTheDocument();
+});
+
+// WIP: Pending to make it work the mocked implementation of history.push
+test.skip("Redirect to /user/{user} when user authenticated.", async () => {
+  const { getByTestId } = render(<Login />);
+
+  axios.get.mockImplementationOnce(() => Promise.resolve({ status: 200 }));
+
+  let username = document.querySelector("[id=username]");
+  let password = document.querySelector("[id=password]");
+
+  fireEvent.change(username, { target: { value: "username" } });
+  fireEvent.change(password, { target: { value: "password" } });
+  fireEvent.click(getByTestId("sign-in-button"));
+
+  expect(mockHistoryPush).toHaveBeenCalledWith(`/user/username`);
+});
 
 // test("Redirect to sign up page when clicked in the link.", () => {
 //    axios.get.mockResolvedValue(response);
