@@ -13,9 +13,6 @@ const App = () => {
           <>
             <div className="App"> 
               <h1> Welcome to Reflexiones de sofá </h1>
-              <p>
-                Log in <a href="/login"> here</a>.
-              </p>
             </div>
           </>
         )}
