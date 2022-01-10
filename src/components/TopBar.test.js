@@ -19,3 +19,9 @@ test("Redirect to home page when home icon button is clicked", () => {
   fireEvent.click(getByTestId("top-bar-home-icon-button"));
   expect(mockHistoryPush).toHaveBeenCalledWith("/");
 });
+
+test("Redirect to sign up page when sign up button is clicked", () => {
+    const { getByTestId } = render(<TopBar />);
+    fireEvent.click(getByTestId("top-bar-sign-up-button"));
+    expect(mockHistoryPush).toHaveBeenCalledWith("/sign-up");
+  });

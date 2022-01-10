@@ -46,6 +46,17 @@ const TopBar = () => {
           >
             Login
           </Button>
+          <Button
+            style={{
+              backgroundColor: "#dfe3e8"
+            }}
+            color="primary"
+            variant="outlined"
+            data-testid="top-bar-sign-up-button"
+            onClick={() => history.push("/sign-up")}
+          >
+            Sign up
+          </Button>
         </Toolbar>
       </AppBar>
     </Box>
