@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import HomeIcon from "@mui/icons-material/Home";
 import { useHistory } from "react-router-dom";
 
 const TopBar = () => {
@@ -24,7 +25,17 @@ const TopBar = () => {
           >
             <MenuIcon />
           </IconButton>
-
+          <IconButton
+            data-testid="top-bar-home-icon-button"
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="home"
+            sx={{ mr: 2 }}
+            onClick={() => history.push("/")}
+          >
+            <HomeIcon />
+          </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Reflexiones de sofá
           </Typography>
