@@ -5,7 +5,6 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import HomeIcon from "@mui/icons-material/Home";
 import { useHistory } from "react-router-dom";
 
@@ -16,15 +15,6 @@ const TopBar = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
           <IconButton
             data-testid="top-bar-home-icon-button"
             size="large"
@@ -48,7 +38,7 @@ const TopBar = () => {
           </Button>
           <Button
             style={{
-              backgroundColor: "#dfe3e8"
+              backgroundColor: "#dfe3e8",
             }}
             color="primary"
             variant="outlined"
