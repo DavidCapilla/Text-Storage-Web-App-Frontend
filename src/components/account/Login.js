@@ -69,7 +69,7 @@ const Login = () => {
     axios
       .get(`${process.env.REACT_APP_BACKEND_URL}/account/login`, { headers })
       .then((response) => {
-        history.push("/user");
+        history.push(`/user/${username}`);
       })
       .catch((error) => {
         try {
