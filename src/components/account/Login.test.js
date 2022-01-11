@@ -156,7 +156,7 @@ test.skip("Redirect to /user/{user} when user authenticated.", async () => {
   fireEvent.change(password, { target: { value: "password" } });
   fireEvent.click(getByTestId("sign-in-button"));
 
-  expect(mockHistoryPush).toHaveBeenCalledWith(`/user/username`);
+  expect(mockHistoryPush).toHaveBeenCalledWith("/user/username");
 });
 
 // test("Redirect to sign up page when clicked in the link.", () => {
