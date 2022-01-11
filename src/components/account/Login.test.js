@@ -159,8 +159,9 @@ test.skip("Redirect to /user/{user} when user authenticated.", async () => {
   expect(mockHistoryPush).toHaveBeenCalledWith("/user/username");
 });
 
-// test("Redirect to sign up page when clicked in the link.", () => {
-//    axios.get.mockResolvedValue(response);
-//     render(<Login />);
-
-// });
+test("Redirect to sign up page when clicked in the link.", () => {
+  const { getByTestId } = render(<Login />);
+  expect(getByTestId("login-redirect-sign-up").getAttribute("href")).toBe(
+    "/sign-up"
+  );
+});
