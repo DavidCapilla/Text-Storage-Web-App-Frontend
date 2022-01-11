@@ -43,6 +43,18 @@ const Login = () => {
   const [passwordInputErrorMessage, setPasswordInputErrorMessage] =
     useState("");
 
+  const validateUsername = (username) => {
+    username
+      ? setUsernameInputErrorMessage("")
+      : setUsernameInputErrorMessage("Username cannot be empty");
+  };
+
+  const validatePassword = (password) => {
+    password
+      ? setPasswordInputErrorMessage("")
+      : setPasswordInputErrorMessage("Password cannot be empty");
+  };
+
   const submitForm = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -50,12 +62,8 @@ const Login = () => {
     const username = data.get("username");
     const password = data.get("password");
 
-    username
-      ? setUsernameInputErrorMessage("")
-      : setUsernameInputErrorMessage("Username cannot be empty");
-    password
-      ? setPasswordInputErrorMessage("")
-      : setPasswordInputErrorMessage("Password cannot be empty");
+    validateUsername(username);
+    validatePassword(password);
 
     if (!username || !password) {
       setErrorMessage("");
