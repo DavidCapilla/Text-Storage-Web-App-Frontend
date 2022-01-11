@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route } from "react-router-dom";
-import Login from "./components/account/Login";
 import TopBar from "./components/TopBar";
+import Login from "./components/account/Login";
+import Signup from "./components/account/Signup";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         )}
       />
       <Route path="/login" component={Login} />
+      <Route path="/sign-up" component={Signup} />
     </Router>
   );
 };
