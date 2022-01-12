@@ -12,9 +12,10 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
-import { Base64 } from "js-base64";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
+
+const REGISTRARION_SUCCESS = "USER_CREATED";
 
 function Copyright(props) {
   return (
@@ -35,7 +36,7 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-const Login = () => {
+const Signup = () => {
   const history = useHistory();
   const [errorMessage, setErrorMessage] = useState("");
   const [usernameInputErrorMessage, setUsernameInputErrorMessage] =
@@ -43,16 +44,17 @@ const Login = () => {
   const [passwordInputErrorMessage, setPasswordInputErrorMessage] =
     useState("");
 
-  const validateUsername = (username) => {
+  const validateRegistrartionUsername = (username) => {
     username
       ? setUsernameInputErrorMessage("")
       : setUsernameInputErrorMessage("Username cannot be empty");
   };
-
-  const validatePassword = (password) => {
-    password
-      ? setPasswordInputErrorMessage("")
-      : setPasswordInputErrorMessage("Password cannot be empty");
+  const validateRegistrarionPassword = (password) => {
+    password.length < 8
+      ? setPasswordInputErrorMessage(
+          "Password must be at least 8 characters long"
+        )
+      : setPasswordInputErrorMessage("");
   };
 
   const submitForm = (event) => {
@@ -62,30 +64,29 @@ const Login = () => {
     const username = data.get("username");
     const password = data.get("password");
 
-    validateUsername(username);
-    validatePassword(password);
+    validateRegistrartionUsername(username);
+    validateRegistrarionPassword(password);
 
     if (!username || !password) {
       setErrorMessage("");
       return;
     }
 
-    const headers = {
-      Authorization: "Basic " + Base64.encode(username + ":" + password),
-    };
-
     axios
-      .get(`${process.env.REACT_APP_BACKEND_URL}/account/login`, { headers })
+      .post(`${process.env.REACT_APP_BACKEND_URL}/account/register`, {
+        username,
+        password,
+      })
       .then((response) => {
-        history.push(`/user/${username}`);
+        response.data === REGISTRARION_SUCCESS
+          ? history.push(`/user/${username}`)
+          : setErrorMessage(`Cannot register the user: ${response.data}`);
       })
       .catch((error) => {
         try {
-          error.response.status === 401
-            ? setErrorMessage("Incorrect username or password.")
-            : setErrorMessage(
-                `Something unexpected happened. ERROR ${error.response.status}`
-              );
+          setErrorMessage(
+            `Something unexpected happened. ERROR ${error.response.status}`
+          );
         } catch (err) {
           setErrorMessage("Something unexpected happened. Try again later.");
         }
@@ -108,7 +109,7 @@ const Login = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Create an account
           </Typography>
           <Box component="form" onSubmit={submitForm} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -137,7 +138,7 @@ const Login = () => {
             />
             {errorMessage && (
               <Alert
-                data-testid="login-error-alert"
+                data-testid="sign-up-error-alert"
                 severity="error"
                 onClose={() => {
                   setErrorMessage("");
@@ -147,23 +148,23 @@ const Login = () => {
               </Alert>
             )}
             <Button
-              data-testid="sign-in-button"
+              data-testid="register-button"
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Register
             </Button>
             <Grid container>
               <Grid item xs></Grid>
               <Grid item>
                 <Link
-                  data-testid="login-redirect-sign-up"
-                  href="/sign-up"
+                  data-testid="sign-up-redirect-login"
+                  href="/login"
                   variant="body2"
                 >
-                  {"Don't have an account? Sign Up"}
+                  {"Already have an account? Log in"}
                 </Link>
               </Grid>
             </Grid>
@@ -175,4 +176,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
